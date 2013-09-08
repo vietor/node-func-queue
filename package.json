@@ -25,6 +25,6 @@
   "engines": {
     "node": "*"
   },
-  "dependencies": {}
-  "devDependencies": {},
+  "dependencies": {},
+  "devDependencies": {}
 }

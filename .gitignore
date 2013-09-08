@@ -10,5 +10,6 @@ lib-cov
 pids
 logs
 results
+.emacs.p
 
 npm-debug.log

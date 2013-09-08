@@ -1,0 +1,30 @@
+{
+  "name": "func-queue",
+  "description": "A simple function sequeue execute queue.",
+  "version": "1.0.0",
+  "keywords": [
+    "queue",
+    "callback"
+  ],
+  "homepage": "https://github.com/vietor/node-func-queue",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vietor/node-func-queue.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vietor/node-func-queue/issues"
+  },
+  "author": {
+    "name": "Vietor Liu",
+    "email": "vietor.liu (at) gmail.com",
+    "url": "https://github.com/vietor"
+  },
+  "contributors": [
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {}
+  "devDependencies": {},
+}

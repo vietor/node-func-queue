@@ -12,7 +12,7 @@ $ npm install func-queue
 ## Usage
 
 ```javascript
-var queue = require('../index');
+var queue = require('func-queue');
 
 var q = queue.createQueue(function(err) {
   if(err)

@@ -14,11 +14,10 @@ $ npm install func-queue
 ```javascript
 var queue = require('func-queue');
 
-var q = queue.createQueue(function(err) {
-  if(err)
-    console.log("error: " + err);
-  else
-    console.log("finished");
+var q = queue.createQueue(function(err, code) {
+  console.log("error: " + err + " code: " + code);
+}, function() {
+  console.log("finished");
 });
 q.add(function() {
   console.log("1111");
@@ -30,7 +29,7 @@ q.add(function( arg1, arg2) {
 });
 q.add(function( arg1, arg2) {
   console.log("3333");
-  return this.error("last");
+  return this.error("last", 999);
   console.log("This is never printed.");
 });
 q.execute();
@@ -38,13 +37,18 @@ q.execute();
 
 ## API
 
-### createQueue(callback)
+### createQueue(callback_error, callback_succssed)
 
 Creates a new query Queue.
 
-#### callback(err)
+#### callback_error(...)
 
-The callback function was called when the `Queue` was completed.
+The callback function was called when the `Queue`'s function call `error()`.
+
+#### callback_successed(...)
+
+The callback function was called when the `Queue` executed completed. It's
+parameters come from the last function call `deliver()`.
 
 ### Queue.add(callback)
 
@@ -56,7 +60,7 @@ Calling `add()` on an already executing Queue has throws an Exception.
 
 The callback function was the delegate function. It bind a object when it called.
 
-##### error(err)
+##### error(...)
 
 Call it when the delegate function catch a error.
 
@@ -66,5 +70,5 @@ Deliver to the next delegate function in the Queue.
 
 ### Queue.execute()
 
-Executes all function that were queued using `Queue.add` as sequence. 
+Executes all function that were queued using `Queue.add` as sequence.
 Calling `execute()` on an already executing Queue has throws an Exception.

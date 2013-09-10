@@ -1,4 +1,4 @@
-function Queue(completed) {
+function Queue(callback_error, callback_successed) {
   var queue = [];
   var aborted = false;
   var executing = false;
@@ -17,18 +17,18 @@ function Queue(completed) {
     executing = true;
 
     if(queue.length < 1) {
-      completed(null);
+      callback_successed();
       return;
     }
 
     var wrapper = {
-      error: function(err) {
+      error: function() {
         aborted = true;
-        completed(err);
+        callback_error.apply(undefined, arguments);
       },
       deliver: function() {
         if(queue.length < 1)
-          completed(null);
+          callback_successed.apply(undefined, arguments);
         else
           queue.shift().apply(wrapper, arguments);
       }

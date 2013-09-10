@@ -1,10 +1,9 @@
 var queue = require('../index');
 
-var q = queue.createQueue(function(err) {
-  if(err)
-    console.log("error: " + err);
-  else
-    console.log("finished");
+var q = queue.createQueue(function(err, code) {
+  console.log("error: " + err + " code: " + code);
+}, function() {
+  console.log("finished");
 });
 q.add(function() {
   console.log("1111");
@@ -16,7 +15,7 @@ q.add(function( arg1, arg2) {
 });
 q.add(function( arg1, arg2) {
   console.log("3333");
-  return this.error("last");
+  return this.error("last", 999);
   console.log("This is never printed.");
 });
 q.execute();

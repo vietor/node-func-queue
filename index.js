@@ -33,7 +33,7 @@ function Queue(callback_error, callback_successed) {
           queue.shift().apply(wrapper, arguments);
       }
     };
-    queue.shift().apply(wrapper, []);
+    queue.shift().apply(wrapper, arguments);
   };
 };
 

@@ -37,6 +37,6 @@ function Queue(callback_error, callback_successed) {
   };
 };
 
-module.exports.createQueue = function(completed) {
-  return new Queue(completed);
+module.exports.createQueue = function(error, successed) {
+  return new Queue(error, successed);
 }

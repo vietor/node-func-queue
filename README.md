@@ -37,7 +37,7 @@ q.execute(11);
 
 ## API
 
-### createQueue(callback_error, callback_succssed)
+### createQueue(callback_error, callback_succssed, [callback_thisArg])
 
 Creates a new query Queue.
 
@@ -50,21 +50,26 @@ The callback function was called when the `Queue`'s function call `error()`.
 The callback function was called when the `Queue` executed completed. It's
 parameters come from the last function call `deliver()`.
 
+#### callback_thisArg
+
+The value of `this` provided for the call to `callback_error()`
+and `callback_successed()`.
+
 ### Queue.add(callback)
 
 Add a delegate function. This query will be queued for execution until `execute()`
 is called on the `Queue`.
 Calling `add()` on an already executing Queue has throws an Exception.
 
-#### callback(....)
+#### callback([...])
 
 The callback function was the delegate function. It bind a object when it called.
 
-##### error(...)
+##### error([...])
 
 Call it when the delegate function catch a error.
 
-##### deliver(...)
+##### deliver([...])
 
 Deliver to the next delegate function in the Queue.
 

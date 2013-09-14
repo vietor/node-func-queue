@@ -1,4 +1,4 @@
-function Queue(callback_error, callback_successed) {
+function Queue(callback_error, callback_successed, callback_thisArg) {
   var queue = [];
   var aborted = false;
   var executing = false;
@@ -24,11 +24,11 @@ function Queue(callback_error, callback_successed) {
     var wrapper = {
       error: function() {
         aborted = true;
-        callback_error.apply(undefined, arguments);
+        callback_error.apply(callback_thisArg, arguments);
       },
       deliver: function() {
         if(queue.length < 1)
-          callback_successed.apply(undefined, arguments);
+          callback_successed.apply(callback_thisArg, arguments);
         else
           queue.shift().apply(wrapper, arguments);
       }
@@ -37,6 +37,6 @@ function Queue(callback_error, callback_successed) {
   };
 };
 
-module.exports.createQueue = function(error, successed) {
-  return new Queue(error, successed);
+module.exports.createQueue = function(callback_error, callback_successed, callback_thisArg) {
+  return new Queue(callback_error, callback_successed, callback_thisArg);
 }

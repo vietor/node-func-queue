@@ -10,6 +10,18 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
     queue.push(callback);
   };
 
+  this.error = function() {
+    aborted = true;
+    callback_error.apply(callback_thisArg, arguments);
+  };
+
+  this.deliver = function() {
+    if(queue.length < 1)
+      callback_successed.apply(callback_thisArg, arguments);
+    else
+      queue.shift().apply(this, arguments);
+  };
+
   this.execute = function() {
     if(executing)
       throw new Error("The Queue already executed");
@@ -21,19 +33,7 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
       return;
     }
 
-    var wrapper = {
-      error: function() {
-        aborted = true;
-        callback_error.apply(callback_thisArg, arguments);
-      },
-      deliver: function() {
-        if(queue.length < 1)
-          callback_successed.apply(callback_thisArg, arguments);
-        else
-          queue.shift().apply(wrapper, arguments);
-      }
-    };
-    queue.shift().apply(wrapper, arguments);
+    queue.shift().apply(this, arguments);
   };
 };
 

@@ -47,8 +47,7 @@ The callback function was called when the `Queue`'s function call `error()`.
 
 #### callback_successed([...])
 
-The callback function was called when the `Queue` executed completed. It's
-parameters come from the last function call `deliver()`.
+The callback function was called when the `Queue` executed completed. It's parameters come from the last function call `deliver()`.
 
 #### callback_thisArg
 
@@ -56,19 +55,18 @@ The value of `this` provided for the call to `callback_error()` and `callback_su
 
 ### Queue.add(callback)
 
-Add a delegate function. This query will be queued for execution until `execute()`
-is called on the `Queue`.
+Add a delegate function. This query will be queued for execution until `execute()` was called by the `Queue`.
 Calling `add()` on an already executing Queue has throws an Exception.
 
 #### callback([...])
 
-The callback function was the delegate function. It bind a object when it called.
+The current `Queue` object is its value of `this` when it called.
 
-##### this.error([...])
+### error([...])
 
 Call it when the delegate function catch a error.
 
-##### this.deliver([...])
+### deliver([...])
 
 Deliver to the next delegate function in the Queue.
 

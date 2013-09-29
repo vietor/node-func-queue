@@ -29,7 +29,7 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
     executing = true;
 
     if(queue.length < 1) {
-      callback_successed();
+      callback_successed.apply(callback_thisArg, arguments);
       return;
     }
 

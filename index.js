@@ -3,6 +3,12 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
   var aborted = false;
   var executing = false;
 
+  var abort = function() {
+    aborted = true;
+    while(queue.length > 0)
+      queue.shift();
+  };
+
   this.add = function(callback) {
     if(executing)
       throw new Error("The Queue already executed");
@@ -11,8 +17,13 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
   };
 
   this.error = function() {
-    aborted = true;
+    abort();
     callback_error.apply(callback_thisArg, arguments);
+  };
+
+  this.escape = function() {
+    abort();
+    callback_successed.apply(callback_thisArg, arguments);
   };
 
   this.deliver = function() {
@@ -39,4 +50,4 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
 
 module.exports.createQueue = function(callback_error, callback_successed, callback_thisArg) {
   return new Queue(callback_error, callback_successed, callback_thisArg);
-}
+};

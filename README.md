@@ -66,6 +66,10 @@ The current `Queue` object is its value of `this` when it called.
 
 Call it when the delegate function catch a error.
 
+### escape([...])
+
+Call it when the delegate function escape the Queue as completed.
+
 ### deliver([...])
 
 Deliver to the next delegate function in the Queue.

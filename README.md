@@ -21,15 +21,15 @@ var q = queue.createQueue(function(err, code) {
 });
 q.add(function(arg1) {
   console.log("1111, arg1: " + arg1);
-  this.deliver(12, 13);
+  q.deliver(12, 13);
 });
 q.add(function( arg1, arg2) {
   console.log("2222, arg1: " + arg1 + " arg2: " + arg2);
-  return this.deliver();
+  q.deliver();
 });
 q.add(function() {
   console.log("3333");
-  return this.error("last", 999);
+  return q.error("last", 999);
   console.log("This is never printed.");
 });
 q.execute(11);

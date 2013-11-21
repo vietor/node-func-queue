@@ -58,6 +58,10 @@ The value of `this` provided for the call to `callback_error()` and `callback_su
 Add a delegate function. This query will be queued for execution until `execute()` was called by the `Queue`.
 Calling `add()` on an already executing Queue has throws an Exception.
 
+### Queue.append(callback)
+
+Append a delegate function. This query will be append to already executing Queue.
+
 #### callback([...])
 
 The current `Queue` object is its value of `this` when it called.

@@ -16,6 +16,10 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
     queue.push(callback);
   };
 
+  this.append = function(callback) {
+    queue.push(callback);
+  };
+
   this.error = function() {
     abort();
     callback_error.apply(callback_thisArg, arguments);

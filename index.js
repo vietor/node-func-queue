@@ -12,11 +12,12 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
   this.add = function(callback) {
     if(executing)
       throw new Error("The Queue already executed");
-
     queue.push(callback);
   };
 
   this.append = function(callback) {
+    if(!executing)
+      throw new Error("The Queue not executed");
     queue.push(callback);
   };
 

@@ -60,7 +60,7 @@ Calling `add()` on an already executing Queue has throws an Exception.
 
 ### Queue.append(callback)
 
-Append a delegate function. This query will be append to already executing Queue.
+Append a delegate function when the Queue already executing.
 
 #### callback([...])
 

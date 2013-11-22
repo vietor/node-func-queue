@@ -1,13 +1,8 @@
 function Queue(callback_error, callback_successed, callback_thisArg) {
   var queue = [];
+  var self = this;
   var aborted = false;
   var executing = false;
-
-  var abort = function() {
-    aborted = true;
-    while(queue.length > 0)
-      queue.shift();
-  };
 
   this.add = function(callback) {
     if(executing)
@@ -21,35 +16,40 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
     queue.push(callback);
   };
 
+  function abort(error, args) {
+    aborted = true;
+    while(queue.length > 0)
+      queue.shift();
+    if(error)
+      callback_error.apply(callback_thisArg, args);
+    else
+      callback_successed.apply(callback_thisArg, args);
+  }
+
   this.error = function() {
-    abort();
-    callback_error.apply(callback_thisArg, arguments);
+    abort(true, arguments);
   };
 
   this.escape = function() {
-    abort();
-    callback_successed.apply(callback_thisArg, arguments);
+    abort(false, arguments);
   };
 
-  this.deliver = function() {
+  function step(args) {
     if(queue.length < 1)
-      callback_successed.apply(callback_thisArg, arguments);
+      callback_successed.apply(callback_thisArg, args);
     else
-      queue.shift().apply(this, arguments);
+      queue.shift().apply(self, args);
+  }
+
+  this.deliver = function() {
+    step(arguments);
   };
 
   this.execute = function() {
     if(executing)
       throw new Error("The Queue already executed");
-
     executing = true;
-
-    if(queue.length < 1) {
-      callback_successed.apply(callback_thisArg, arguments);
-      return;
-    }
-
-    queue.shift().apply(this, arguments);
+    step(arguments);
   };
 };
 

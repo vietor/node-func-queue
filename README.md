@@ -29,8 +29,12 @@ q.add(function( arg1, arg2) {
 });
 q.add(function() {
   console.log("3333");
-  return q.error("last", 999);
-  console.log("This is never printed.");
+  q.append(function() {
+    console.log("4444");
+    return q.error("last", 999);
+    console.log("This is never printed.");
+  });
+  q.deliver();
 });
 q.execute(11);
 ```

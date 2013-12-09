@@ -56,3 +56,49 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
 module.exports.createQueue = function(callback_error, callback_successed, callback_thisArg) {
   return new Queue(callback_error, callback_successed, callback_thisArg);
 };
+
+function QueueArray(callback_done, callback_thisArg) {
+  var array = [];
+  var results = [];
+  var completed = 0;
+  var executing = false;
+
+  function maintain() {
+    ++ completed;
+    if(completed >= array.length) {
+      callback_done.apply(callback_thisArg, [results]);
+    }
+  }
+
+  this.createQueue = function(key) {
+    if(executing)
+      throw new Error("The QueueArray already executed");
+    var result = {key: key, error: null, successed: null};
+    var queue = new Queue(function() {
+      result.error = arguments;
+      maintain();
+    }, function() {
+      result.successed = arguments;
+      maintain();
+    });
+    array.push(queue);
+    results.push(result);
+    return queue;
+  };
+
+  this.execute = function() {
+    if(executing)
+      throw new Error("The QueueArray already executed");
+    executing = true;
+    if(array.length < 1)
+      callback_done.apply(callback_thisArg, results);
+    else {
+      for(var i = 0; i < array.length; ++i)
+	array[i].execute();
+    }
+  };
+}
+
+module.exports.createQueueArray = function(callback_done, callback_thisArg) {
+  return new QueueArray(callback_done, callback_thisArg);
+};

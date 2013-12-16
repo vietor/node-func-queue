@@ -25,9 +25,9 @@ q.add(function() {
 });
 q.execute(1);
 
-console.log("QueueArray test:");
-var qa = queue.createQueueArray(function(results) {
-  console.log("QueueArray results:");
+console.log("ConcurrentQueue test:");
+var qa = queue.createConcurrentQueue(function(results) {
+  console.log("ConcurrentQueue results:");
   for(var i=0; i<results.length; i++) {
     var result = results[i];
     console.log("key: %s, error: %j, successed: %j", result.key, result.error, result.successed);
@@ -35,8 +35,10 @@ var qa = queue.createQueueArray(function(results) {
 });
 var q1 = qa.createQueue("k1");
 q1.add(function() {
-  console.log("k1, func1");
-  q1.deliver("q1 successed", 999);
+  setTimeout(function() {
+    console.log("k1, func1");
+    q1.deliver("q1 successed", 999);
+  }, 100);
 });
 var q2 = qa.createQueue("k2");
 q2.add(function() {
@@ -44,7 +46,9 @@ q2.add(function() {
   q2.deliver();
 });
 q2.add(function() {
-  console.log("k2, func2");
-  q2.error("q2 error");
+  setTimeout(function() {
+    console.log("k2, func2");
+    q2.error("q2 error");
+  }, 200);
 });
 qa.execute();

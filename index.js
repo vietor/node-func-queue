@@ -57,13 +57,13 @@ module.exports.createQueue = function(callback_error, callback_successed, callba
   return new Queue(callback_error, callback_successed, callback_thisArg);
 };
 
-function QueueArray(callback_done, callback_thisArg) {
+function ConcurrentQueue(callback_done, callback_thisArg) {
   var array = [];
   var results = [];
   var completed = 0;
   var executing = false;
 
-  function maintain() {
+  function checkAndProcessDone() {
     ++ completed;
     if(completed >= array.length) {
       callback_done.apply(callback_thisArg, [results]);
@@ -76,10 +76,10 @@ function QueueArray(callback_done, callback_thisArg) {
     var result = {key: key, error: null, successed: null};
     var queue = new Queue(function() {
       result.error = arguments;
-      maintain();
+      checkAndProcessDone();
     }, function() {
       result.successed = arguments;
-      maintain();
+      checkAndProcessDone();
     });
     array.push(queue);
     results.push(result);
@@ -91,7 +91,7 @@ function QueueArray(callback_done, callback_thisArg) {
       throw new Error("The QueueArray already executed");
     executing = true;
     if(array.length < 1)
-      callback_done.apply(callback_thisArg, results);
+      callback_done.apply(callback_thisArg, [results]);
     else {
       for(var i = 0; i < array.length; ++i)
 	array[i].execute();
@@ -99,6 +99,6 @@ function QueueArray(callback_done, callback_thisArg) {
   };
 }
 
-module.exports.createQueueArray = function(callback_done, callback_thisArg) {
-  return new QueueArray(callback_done, callback_thisArg);
+module.exports.createConcurrentQueue = function(callback_done, callback_thisArg) {
+  return new ConcurrentQueue(callback_done, callback_thisArg);
 };

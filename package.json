@@ -1,7 +1,7 @@
 {
   "name": "func-queue",
-  "description": "A simple function sequeue execute queue.",
-  "version": "1.0.8",
+  "description": "A simple function sequence & concurrent execute Queue.",
+  "version": "1.1.0",
   "keywords": [
     "queue",
     "callback"

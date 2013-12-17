@@ -14,29 +14,58 @@ $ npm install func-queue
 ```javascript
 var queue = require('func-queue');
 
+console.log("Queue test:");
 var q = queue.createQueue(function(err, code) {
   console.log("error: " + err + " code: " + code);
 }, function() {
   console.log("finished");
 });
 q.add(function(arg1) {
-  console.log("1111, arg1: " + arg1);
-  q.deliver(12, 13);
+  console.log("step1, arg1: " + arg1);
+  q.deliver(2, 3);
 });
 q.add(function( arg1, arg2) {
-  console.log("2222, arg1: " + arg1 + " arg2: " + arg2);
+  console.log("step2, arg1: " + arg1 + " arg2: " + arg2);
   q.deliver();
 });
 q.add(function() {
-  console.log("3333");
+  console.log("step3");
   q.append(function() {
-    console.log("4444");
-    return q.error("last", 999);
+    console.log("step4");
+    return q.error("last", 4);
     console.log("This is never printed.");
   });
   q.deliver();
 });
-q.execute(11);
+q.execute(1);
+
+console.log("ConcurrentQueue test:");
+var qa = queue.createConcurrentQueue(function(results) {
+  console.log("ConcurrentQueue results:");
+  for(var i=0; i<results.length; i++) {
+    var result = results[i];
+    console.log("key: %s, error: %j, successed: %j", result.key, result.error, result.successed);
+  }
+});
+var q1 = qa.createQueue("k1");
+q1.add(function() {
+  setTimeout(function() {
+    console.log("k1, func1");
+    q1.deliver("q1 successed", 999);
+  }, 100);
+});
+var q2 = qa.createQueue("k2");
+q2.add(function() {
+  console.log("k2, func1");
+  q2.deliver();
+});
+q2.add(function() {
+  setTimeout(function() {
+    console.log("k2, func2");
+    q2.error("q2 error");
+  }, 200);
+});
+qa.execute();
 ```
 
 ## API
@@ -86,3 +115,21 @@ Deliver to the next delegate function in the Queue.
 
 Executes all function that were queued using `Queue.add` as sequence.
 Calling `execute()` on an already executing Queue has throws an Exception.
+
+### createConcurrentQueue(callback_done, [callback_thisArg])
+
+Creates a new query ConcurrentQueue.
+
+#### callback_done(results)
+
+The callback function was called when the `ConcurrentQueue`'s all child `Queue` was completed.
+
+### ConcurrentQueue.createQueue([key])
+
+Create and add a child `Queue`, return the new `Queue`'s instance. Don't direct call the `Queue`'s `execute()`, it automatic be called until `execute()` was called by the `ConcurrentQueue`.
+Calling `createQueue()` on an already executing ConcurrentQueue has throws an Exception.
+
+### ConcurrentQueue.execute()
+
+Executes all child `Queue` that were created using `ConcurrentQueue.createQueue` as concurrented.
+Calling `execute()` on an already executing ConcurrentQueue has throws an Exception.

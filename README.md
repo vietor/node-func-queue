@@ -67,9 +67,26 @@ q2.add(function() {
 });
 qa.execute();
 ```
+### Output
+```
+Queue test:
+step1, arg1: 1
+step2, arg1: 2 arg2: 3
+step3
+step4
+error: last code: 4
+ConcurrentQueue test:
+k2, func1
+k1, func1
+k2, func2
+ConcurrentQueue results:
+key: k1, error: null, successed: {"0":"q1 successed","1":999}
+key: k2, error: {"0":"q2 error"}, successed: null
+```
 
 ## API
 
+***
 ### createQueue(callback_error, callback_succssed, [callback_thisArg])
 
 Creates a new query Queue.
@@ -116,6 +133,7 @@ Deliver to the next delegate function in the Queue.
 Executes all function that were queued using `Queue.add` as sequence.
 Calling `execute()` on an already executing Queue has throws an Exception.
 
+***
 ### createConcurrentQueue(callback_done, [callback_thisArg])
 
 Creates a new query ConcurrentQueue.

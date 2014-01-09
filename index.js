@@ -1,3 +1,56 @@
+function PersistentQueue(callback_error, callback_successed, callback_thisArg) {
+  var queue = [];
+  var self = this;
+  var aborted = false;
+  var executing = false;
+  var ptr = -1;
+  var len = 0;
+
+  this.add = function(callback) {
+    queue.push(callback);
+    len = queue.length;
+    ptr++;
+  };
+
+  function abort(error, args) {
+    aborted = true;
+    while(ptr < len) ptr++;
+
+    if(error)
+      callback_error.apply(callback_thisArg, args);
+    else
+      callback_successed.apply(callback_thisArg, args);
+  }
+
+  this.error = function() {
+    abort(true, arguments);
+  };
+
+  this.escape = function() {
+    abort(false, arguments);
+  };
+
+  function step(args) {
+    if(ptr == len-1) {
+      callback_successed.apply(callback_thisArg, args);
+      ptr++;
+    }
+    else {      
+      ptr++;    
+      queue[ptr].apply(self, args);
+    }
+  }
+
+  this.deliver = function() {
+    step(arguments);
+  };
+
+  this.execute = function() {
+    ptr=-1;
+    step(arguments);
+  };
+}
+
 function Queue(callback_error, callback_successed, callback_thisArg) {
   var queue = [];
   var self = this;

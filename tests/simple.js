@@ -8,22 +8,30 @@ var q = queue.createQueue(function(err, code) {
 });
 q.add(function(arg1) {
   console.log("step1, arg1: " + arg1);
-  q.deliver(2, 3);
+  q.deliver(++arg1);
 });
-q.add(function( arg1, arg2) {
-  console.log("step2, arg1: " + arg1 + " arg2: " + arg2);
-  q.deliver();
-});
-q.add(function() {
-  console.log("step3");
-  q.append(function() {
-    console.log("step4");
-    return q.error("last", 4);
+q.add(function(arg1) {
+  console.log("step2, arg1: " + arg1);
+  q.append(function(arg1) {
+    console.log("step3, arg1: " + arg1);
+    return q.error("last", -1);
     console.log("This is never printed.");
   });
-  q.deliver();
+  q.deliver(++arg1);
 });
 q.execute(1);
+
+console.log("PersistentQueue test:");
+var pq = queue.createPersistentQueue(function(err, code) {
+  console.log("error: " + err + " code: " + code);
+}, function() {
+  console.log("finished");
+});
+pq.add(function(i) {
+  console.log("value: " + i);
+});
+pq.execute(1);
+pq.execute(2);
 
 console.log("ConcurrentQueue test:");
 var qa = queue.createConcurrentQueue(function(results) {

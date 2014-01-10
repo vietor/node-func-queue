@@ -35,8 +35,8 @@ function PersistentQueue(callback_error, callback_successed, callback_thisArg) {
       callback_successed.apply(callback_thisArg, args);
       ptr++;
     }
-    else {      
-      ptr++;    
+    else {
+      ptr++;
       queue[ptr].apply(self, args);
     }
   }
@@ -50,6 +50,10 @@ function PersistentQueue(callback_error, callback_successed, callback_thisArg) {
     step(arguments);
   };
 }
+
+module.exports.createPersistentQueue = function(callback_error, callback_successed, callback_thisArg) {
+  return new PersistentQueue(callback_error, callback_successed, callback_thisArg);
+};
 
 function Queue(callback_error, callback_successed, callback_thisArg) {
   var queue = [];

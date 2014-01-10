@@ -22,22 +22,30 @@ var q = queue.createQueue(function(err, code) {
 });
 q.add(function(arg1) {
   console.log("step1, arg1: " + arg1);
-  q.deliver(2, 3);
+  q.deliver(++arg1);
 });
-q.add(function( arg1, arg2) {
-  console.log("step2, arg1: " + arg1 + " arg2: " + arg2);
-  q.deliver();
-});
-q.add(function() {
-  console.log("step3");
-  q.append(function() {
-    console.log("step4");
-    return q.error("last", 4);
+q.add(function(arg1) {
+  console.log("step2, arg1: " + arg1);
+  q.append(function(arg1) {
+    console.log("step3, arg1: " + arg1);
+    return q.error("last", -1);
     console.log("This is never printed.");
   });
-  q.deliver();
+  q.deliver(++arg1);
 });
 q.execute(1);
+
+console.log("PersistentQueue test:");
+var pq = queue.createPersistentQueue(function(err, code) {
+  console.log("error: " + err + " code: " + code);
+}, function() {
+  console.log("finished");
+});
+pq.add(function(i) {
+  console.log("value: " + i);
+});
+pq.execute(1);
+pq.execute(2);
 
 console.log("ConcurrentQueue test:");
 var qa = queue.createConcurrentQueue(function(results) {
@@ -71,10 +79,12 @@ qa.execute();
 ```
 Queue test:
 step1, arg1: 1
-step2, arg1: 2 arg2: 3
-step3
-step4
-error: last code: 4
+step2, arg1: 2
+step3, arg1: 3
+error: last code: -1
+PersistentQueue test:
+value: 1
+value: 2
 ConcurrentQueue test:
 k2, func1
 k1, func1
@@ -108,6 +118,10 @@ The value of `this` provided for the call to `callback_error()` and `callback_su
 Add a delegate function. This query will be queued for execution until `execute()` was called by the `Queue`.
 Calling `add()` on an already executing Queue has throws an Exception.
 
+#### callback([...])
+
+The current `Queue` object is its value of `this` when it called.
+
 ### Queue.append(callback)
 
 Append a delegate function when the Queue already executing.
@@ -131,6 +145,49 @@ Deliver to the next delegate function in the Queue.
 ### Queue.execute([...])
 
 Executes all function that were queued using `Queue.add` as sequence.
+Calling `execute()` on an already executing Queue has throws an Exception.
+
+***
+### createPersistentQueue(callback_error, callback_succssed, [callback_thisArg])
+
+Creates a new query Queue.
+
+#### callback_error([...])
+
+The callback function was called when the `PersistentQueue`'s function call `error()`.
+
+#### callback_successed([...])
+
+The callback function was called when the `PersistentQueue` executed completed. It's parameters come from the last function call `deliver()`.
+
+#### callback_thisArg
+
+The value of `this` provided for the call to `callback_error()` and `callback_successed()`.
+
+### PersistentQueue.add(callback)
+
+Add a delegate function. This query will be queued for execution until `execute()` was called by the `PersistentQueue`.
+Calling `add()` on an already executing Queue has throws an Exception.
+
+#### callback([...])
+
+The current `PersistentQueue` object is its value of `this` when it called.
+
+### error([...])
+
+Call it when the delegate function catch a error.
+
+### escape([...])
+
+Call it when the delegate function escape the Queue as completed.
+
+### deliver([...])
+
+Deliver to the next delegate function in the Queue.
+
+### PersistentQueue.execute([...])
+
+Executes all function that were queued using `PersistentQueue.add` as sequence.
 Calling `execute()` on an already executing Queue has throws an Exception.
 
 ***

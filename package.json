@@ -1,10 +1,12 @@
 {
   "name": "func-queue",
   "description": "A simple function sequence & concurrent execute Queue.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "keywords": [
     "queue",
-    "callback"
+    "callback",
+    "concurrent",
+    "persistent"
   ],
   "homepage": "https://github.com/vietor/node-func-queue",
   "repository": {
@@ -20,6 +22,11 @@
     "url": "https://github.com/vietor"
   },
   "contributors": [
+    {
+      "name": "Eric",
+      "email": "gould (at) emgtrading.net",
+      "url": "https://github.com/emgould"
+    }
   ],
   "main": "index.js",
   "engines": {

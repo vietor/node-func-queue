@@ -1,7 +1,6 @@
 function PersistentQueue(callback_error, callback_successed, callback_thisArg) {
   var queue = [];
   var self = this;
-  var aborted = false;
   var executing = false;
   var ptr = -1;
   var len = 0;
@@ -13,7 +12,6 @@ function PersistentQueue(callback_error, callback_successed, callback_thisArg) {
   };
 
   function abort(error, args) {
-    aborted = true;
     while(ptr < len) ptr++;
 
     if(error)

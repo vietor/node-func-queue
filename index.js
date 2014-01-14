@@ -58,25 +58,26 @@ module.exports.createPersistentQueue = function(callback_error, callback_success
 function Queue(callback_error, callback_successed, callback_thisArg) {
   var queue = [];
   var self = this;
-  var aborted = false;
+  var pos = 0, size = 0;
   var executing = false;
 
   this.add = function(callback) {
     if(executing)
       throw new Error("The Queue already executed");
+    ++size;
     queue.push(callback);
   };
 
   this.append = function(callback) {
     if(!executing)
       throw new Error("The Queue not executed");
+    ++size;
     queue.push(callback);
   };
 
   function abort(error, args) {
-    aborted = true;
-    while(queue.length > 0)
-      queue.shift();
+    while(pos < size)
+      queue[pos++] = null;
     if(error)
       callback_error.apply(callback_thisArg, args);
     else
@@ -92,10 +93,13 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
   };
 
   function step(args) {
-    if(queue.length < 1)
+    if(pos >= size)
       callback_successed.apply(callback_thisArg, args);
-    else
-      queue.shift().apply(self, args);
+    else {
+      if(pos > 1)
+        queue[pos - 1] = null;
+      queue[pos++].apply(self, args);
+    }
   }
 
   this.deliver = function() {
@@ -151,7 +155,7 @@ function ConcurrentQueue(callback_done, callback_thisArg) {
       callback_done.apply(callback_thisArg, [results]);
     else {
       for(var i = 0; i < array.length; ++i)
-	array[i].execute();
+        array[i].execute();
     }
   };
 }

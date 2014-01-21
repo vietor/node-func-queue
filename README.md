@@ -97,7 +97,7 @@ key: k2, error: {"0":"q2 error"}, successed: null
 ## API
 
 ***
-### createQueue(callback_error, callback_succssed, [callback_thisArg])
+### createQueue(callback_error, [callback_succssed], [callback_thisArg])
 
 Creates a new query Queue.
 
@@ -108,6 +108,7 @@ The callback function was called when the `Queue`'s function call `error()`.
 #### callback_successed([...])
 
 The callback function was called when the `Queue` executed completed. It's parameters come from the last function call `deliver()`.
+If the function was undefined or null, call callback_error with append new first parameter to null when completed.
 
 #### callback_thisArg
 

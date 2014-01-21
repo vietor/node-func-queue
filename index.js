@@ -1,59 +1,7 @@
-function PersistentQueue(callback_error, callback_successed, callback_thisArg) {
-  var queue = [];
-  var self = this;
-  var executing = false;
-  var ptr = -1;
-  var len = 0;
+var TYPE_NORMAL = 0;
+var TYPE_PERSISTENT = 1;
 
-  this.add = function(callback) {
-    queue.push(callback);
-    len = queue.length;
-    ptr++;
-  };
-
-  function abort(error, args) {
-    while(ptr < len) ptr++;
-
-    if(error)
-      callback_error.apply(callback_thisArg, args);
-    else
-      callback_successed.apply(callback_thisArg, args);
-  }
-
-  this.error = function() {
-    abort(true, arguments);
-  };
-
-  this.escape = function() {
-    abort(false, arguments);
-  };
-
-  function step(args) {
-    if(ptr == len-1) {
-      callback_successed.apply(callback_thisArg, args);
-      ptr++;
-    }
-    else {
-      ptr++;
-      queue[ptr].apply(self, args);
-    }
-  }
-
-  this.deliver = function() {
-    step(arguments);
-  };
-
-  this.execute = function() {
-    ptr=-1;
-    step(arguments);
-  };
-}
-
-module.exports.createPersistentQueue = function(callback_error, callback_successed, callback_thisArg) {
-  return new PersistentQueue(callback_error, callback_successed, callback_thisArg);
-};
-
-function Queue(callback_error, callback_successed, callback_thisArg) {
+function Queue(store_type, callback_error, callback_successed, callback_thisArg) {
   var queue = [];
   var self = this;
   var pos = 0, size = 0;
@@ -69,6 +17,8 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
   this.append = function(callback) {
     if(!executing)
       throw new Error("The Queue not executed");
+    if(store_type != TYPE_NORMAL)
+      throw new Error("The Queue not support append");
     ++size;
     queue.push(callback);
   };
@@ -85,8 +35,10 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
   }
 
   function abort(error, args) {
-    while(pos < size)
-      queue[pos++] = null;
+    if(store_type == TYPE_NORMAL) {
+      while(pos < size)
+        queue[pos++] = null;
+    }
     if(error)
       done_error(args);
     else
@@ -105,7 +57,7 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
     if(pos >= size)
       done_success(args);
     else {
-      if(pos > 1)
+      if(store_type == TYPE_NORMAL && pos > 1)
         queue[pos - 1] = null;
       queue[pos++].apply(self, args);
     }
@@ -116,15 +68,23 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
   };
 
   this.execute = function() {
-    if(executing)
-      throw new Error("The Queue already executed");
+    if(store_type != TYPE_NORMAL)
+      pos = 0;
+    else {
+      if(executing)
+        throw new Error("The Queue already executed");
+    }
     executing = true;
     step(arguments);
   };
 };
 
 module.exports.createQueue = function(callback_error, callback_successed, callback_thisArg) {
-  return new Queue(callback_error, callback_successed, callback_thisArg);
+  return new Queue(TYPE_NORMAL, callback_error, callback_successed, callback_thisArg);
+};
+
+module.exports.createPersistentQueue = function(callback_error, callback_successed, callback_thisArg) {
+  return new Queue(TYPE_PERSISTENT, callback_error, callback_successed, callback_thisArg);
 };
 
 function ConcurrentQueue(callback_done, callback_thisArg) {
@@ -144,7 +104,7 @@ function ConcurrentQueue(callback_done, callback_thisArg) {
     if(executing)
       throw new Error("The QueueArray already executed");
     var result = {key: key, error: null, successed: null};
-    var queue = new Queue(function() {
+    var queue = new Queue(TYPE_NORMAL, function() {
       result.error = arguments;
       checkAndProcessDone();
     }, function() {

@@ -73,13 +73,24 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
     queue.push(callback);
   };
 
+  function done_error(args) {
+    callback_error.apply(callback_thisArg, args);
+  }
+
+  function done_success(args) {
+    if(callback_successed)
+      callback_successed.apply(callback_thisArg, args);
+    else
+      callback_error.apply(callback_thisArg, [null].concat(args));
+  }
+
   function abort(error, args) {
     while(pos < size)
       queue[pos++] = null;
     if(error)
-      callback_error.apply(callback_thisArg, args);
+      done_error(args);
     else
-      callback_successed.apply(callback_thisArg, args);
+      done_success(args);
   }
 
   this.error = function() {
@@ -92,7 +103,7 @@ function Queue(callback_error, callback_successed, callback_thisArg) {
 
   function step(args) {
     if(pos >= size)
-      callback_successed.apply(callback_thisArg, args);
+      done_success(args);
     else {
       if(pos > 1)
         queue[pos - 1] = null;

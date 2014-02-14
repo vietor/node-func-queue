@@ -30,8 +30,10 @@ function Queue(store_type, callback_error, callback_successed, callback_thisArg)
   function done_success(args) {
     if(callback_successed)
       callback_successed.apply(callback_thisArg, args);
-    else
-      callback_error.apply(callback_thisArg, [null].concat(args));
+    else {
+      [].unshift.call(args, null);
+      callback_error.apply(callback_thisArg, args);
+    }
   }
 
   function abort(error, args) {

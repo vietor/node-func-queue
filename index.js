@@ -23,41 +23,34 @@ function Queue(store_type, callback_error, callback_successed, callback_thisArg)
     queue.push(callback);
   };
 
-  function done_error(args) {
-    callback_error.apply(callback_thisArg, args);
-  }
-
-  function done_success(args) {
-    if(callback_successed)
-      callback_successed.apply(callback_thisArg, args);
-    else {
-      [].unshift.call(args, null);
-      callback_error.apply(callback_thisArg, args);
-    }
-  }
-
-  function abort(error, args) {
+  function finish(error, args) {
     if(store_type == TYPE_NORMAL) {
       while(pos < size)
         queue[pos++] = null;
     }
     if(error)
-      done_error(args);
-    else
-      done_success(args);
+      callback_error.apply(callback_thisArg, args);
+    else {
+      if(callback_successed)
+        callback_successed.apply(callback_thisArg, args);
+      else {
+        [].unshift.call(args, null);
+        callback_error.apply(callback_thisArg, args);
+      }
+    }
   }
 
   this.error = function() {
-    abort(true, arguments);
+    finish(true, arguments);
   };
 
   this.escape = function() {
-    abort(false, arguments);
+    finish(false, arguments);
   };
 
   function step(args) {
     if(pos >= size)
-      done_success(args);
+      finish(true, args);
     else {
       if(store_type == TYPE_NORMAL && pos > 1)
         queue[pos - 1] = null;

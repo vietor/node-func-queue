@@ -104,7 +104,7 @@ function ConcurrentQueue(callback_done, callback_thisArg) {
 
   this.createQueue = function(key) {
     if(executing)
-      throw new Error("The QueueArray already executed");
+      throw new Error("The ConcurrentQueue already executed");
     var result = {key: key, error: null, successed: null};
     var queue = new Queue(TYPE_NORMAL, function() {
       result.error = arguments;
@@ -120,7 +120,7 @@ function ConcurrentQueue(callback_done, callback_thisArg) {
 
   this.execute = function() {
     if(executing)
-      throw new Error("The QueueArray already executed");
+      throw new Error("The ConcurrentQueue already executed");
     executing = true;
     if(array.length < 1)
       callback_done.apply(callback_thisArg, [results]);
